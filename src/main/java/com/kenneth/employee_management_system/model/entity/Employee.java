@@ -20,7 +20,7 @@ public class Employee {
 
     @Id
     @GeneratedValue // This defaults to AUTO
-    private long id;
+    private Long id;
 
     @NotBlank
     @Size(max = 50)
@@ -48,7 +48,7 @@ public class Employee {
     private LocalDate dateOfJoining;
 
     @NotNull
-    private boolean active = true;
+    private Boolean active = true;
 
     @Column(updatable = false)//prevents update of column after insertion
     private LocalDateTime createdAt;
