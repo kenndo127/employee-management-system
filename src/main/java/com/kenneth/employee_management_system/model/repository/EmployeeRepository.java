@@ -1,5 +1,6 @@
 package com.kenneth.employee_management_system.model.repository;
 
+import com.kenneth.employee_management_system.model.entity.Department;
 import com.kenneth.employee_management_system.model.entity.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-    List<Employee> findByDepartment(String department);
+    List<Employee> findByDepartment(Department department);
 
     Optional<Employee> findByEmail(String email);
 
