@@ -2,23 +2,31 @@ package com.kenneth.employee_management_system.controllers;
 
 import com.kenneth.employee_management_system.dto.request.EmployeeRequestDto;
 import com.kenneth.employee_management_system.dto.response.EmployeeResponseDto;
+import com.kenneth.employee_management_system.dto.response.ImportResultDto;
 import com.kenneth.employee_management_system.model.service.EmployeeService;
+import com.kenneth.employee_management_system.model.service.ExcelImportService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
-
+// the legal aspect of data acquisition in
 @RestController
 @RequestMapping("/api/v1/employees")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    private final ExcelImportService excelImportService;
 
-    public EmployeeController(EmployeeService employeeService){
+    public EmployeeController(
+            EmployeeService employeeService,
+            ExcelImportService excelImportService
+    ){
         this.employeeService = employeeService;
+        this.excelImportService = excelImportService;
     }
 
     @PostMapping
@@ -89,4 +97,9 @@ public class EmployeeController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/import")
+    public ResponseEntity<ImportResultDto> importEmployees(
+            @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(excelImportService.importEmployees(file));
+    }
 }

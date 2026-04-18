@@ -25,7 +25,7 @@ public class EmployeeRequestDto {
     @Email
     private String email;
 
-    @NotNull
+    //@NotNull
     private Long departmentId;
 
     @NotNull
