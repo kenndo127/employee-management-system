@@ -1,6 +1,5 @@
 package com.kenneth.employee_management_system.dto.response;
 
-import com.kenneth.employee_management_system.model.entity.Department;
 import com.kenneth.employee_management_system.model.entity.Employee;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +23,11 @@ public class EmployeeResponseDto {
 
     private String email;
 
-    private Department department;
+    private Long departmentId;
+
+    private String departmentName;
+
+    private Boolean internAllowed;
 
     private BigDecimal salary;
 
@@ -42,7 +45,9 @@ public class EmployeeResponseDto {
         dto.setFirstName(employee.getFirstName());
         dto.setLastName(employee.getLastName());
         dto.setEmail(employee.getEmail());
-        dto.setDepartment(employee.getDepartment());
+        dto.setDepartmentId(employee.getDepartment().getId());
+        dto.setDepartmentName(employee.getDepartment().getName());
+        dto.setInternAllowed(employee.getDepartment().getInternAllowed());
         dto.setSalary(employee.getSalary());
         dto.setDateOfJoining(employee.getDateOfJoining());
         dto.setActive(employee.getActive());

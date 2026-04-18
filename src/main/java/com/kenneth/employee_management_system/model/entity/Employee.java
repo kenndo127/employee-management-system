@@ -35,7 +35,7 @@ public class Employee {
     @Column(unique = true)
     private String email;
 
-    @NotBlank
+    @NotNull
     @ManyToOne
     private Department department;
 

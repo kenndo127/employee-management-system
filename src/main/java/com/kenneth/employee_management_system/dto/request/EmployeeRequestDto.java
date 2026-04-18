@@ -1,7 +1,5 @@
 package com.kenneth.employee_management_system.dto.request;
 
-import com.kenneth.employee_management_system.model.entity.Department;
-import com.kenneth.employee_management_system.model.entity.Employee;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -27,9 +25,8 @@ public class EmployeeRequestDto {
     @Email
     private String email;
 
-    @NotBlank
-    @Size(max = 100)
-    private Department department;
+    @NotNull
+    private Long departmentId;
 
     @NotNull
     @DecimalMin("0.00")
@@ -41,16 +38,4 @@ public class EmployeeRequestDto {
 
     @NotNull
     private Boolean active = true;
-
-    public Employee toEntity() {
-        Employee employee = new Employee();
-        employee.setFirstName(this.firstName);
-        employee.setLastName(this.lastName);
-        employee.setEmail(this.email);
-        employee.setDepartment(this.department);
-        employee.setSalary(this.salary);
-        employee.setDateOfJoining(this.dateOfJoining);
-        employee.setActive(this.active);
-        return employee;
-    }
 }

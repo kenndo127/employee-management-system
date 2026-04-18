@@ -1,8 +1,11 @@
 package com.kenneth.employee_management_system.model.service.impl;
 
+import com.kenneth.employee_management_system.dto.request.EmployeeRequestDto;
+import com.kenneth.employee_management_system.exceptions.DepartmentNotFoundException;
 import com.kenneth.employee_management_system.exceptions.DuplicateEmailException;
 import com.kenneth.employee_management_system.exceptions.EmployeeNotFoundException;
 import com.kenneth.employee_management_system.exceptions.InvalidEmployeeStateException;
+import com.kenneth.employee_management_system.model.entity.Department;
 import com.kenneth.employee_management_system.model.entity.Employee;
 import com.kenneth.employee_management_system.model.repository.DepartmentRepository;
 import com.kenneth.employee_management_system.model.repository.EmployeeRepository;
@@ -25,24 +28,31 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee createEmployee(Employee employee) {
+    public Employee createEmployee(EmployeeRequestDto dtoEmployee) {
 
         //Checking duplicate
-        if(employeeRepository.findByEmail(employee.getEmail()).isPresent()){
+        if(employeeRepository.findByEmail(dtoEmployee.getEmail()).isPresent()){
             throw new DuplicateEmailException("Employee is already registered");
         }
 
+        //fetch the department using the department id
+        Department department = departmentRepository.findById(dtoEmployee.getDepartmentId())
+                .orElseThrow(() -> new DepartmentNotFoundException("Department does not exist!"));
+
         //Checking valid salary range
-        if(employee.getDepartment().equalsIgnoreCase("Intern"))
-            if(employee.getSalary().compareTo(new BigDecimal("15000")) < 0)
-                throw new IllegalArgumentException("Salary must be greater than or equal to 15000 for Interns");
+        validateSalary(department, dtoEmployee);
 
-        if(!employee.getDepartment().equalsIgnoreCase("Intern"))
-            if(employee.getSalary().compareTo(new BigDecimal("30000")) < 0)
-                throw new IllegalArgumentException("Salary must be greater than or equal to 30000 for Employees");
+        //Build employee entity
+        Employee employeeToBeCreated = new Employee();
+        employeeToBeCreated.setFirstName(dtoEmployee.getFirstName());
+        employeeToBeCreated.setLastName(dtoEmployee.getLastName());
+        employeeToBeCreated.setEmail(dtoEmployee.getEmail());
+        employeeToBeCreated.setDepartment(department);
+        employeeToBeCreated.setSalary(dtoEmployee.getSalary());
+        employeeToBeCreated.setDateOfJoining(dtoEmployee.getDateOfJoining());
+        employeeToBeCreated.setActive(dtoEmployee.getActive());
 
-
-        return employeeRepository.save(employee); //Returns an entity from the database
+        return employeeRepository.save(employeeToBeCreated); //Returns an entity from the database
     }
 
     @Override
@@ -56,7 +66,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee updateEmployee(Long id, Employee employee) {
+    public Employee updateEmployee(Long id, EmployeeRequestDto employee) {
 
         Employee employeeToUpdate = getEmployeeById(id); // a method defined above
 
@@ -64,19 +74,17 @@ public class EmployeeServiceImpl implements EmployeeService {
             if(employeeRepository.findByEmail(employee.getEmail()).isPresent())
                 throw new DuplicateEmailException("Duplicate email!! Email: " + employee.getEmail() + " already exists");
 
-        //Checking valid salary range
-        if(employee.getDepartment().equalsIgnoreCase("Intern"))
-            if(employee.getSalary().compareTo(new BigDecimal("15000")) < 0)
-                throw new IllegalArgumentException("Salary must be greater than or equal to 15000 for Interns");
+        //fetch the department using the department id
+        Department department = departmentRepository.findById(employee.getDepartmentId())
+                .orElseThrow(() -> new DepartmentNotFoundException("Department does not exist!"));
 
-        if(!employee.getDepartment().equalsIgnoreCase("Intern"))
-            if(employee.getSalary().compareTo(new BigDecimal("30000")) < 0)
-                throw new IllegalArgumentException("Salary must be greater than or equal to 30000 for Employees");
+        //Checking valid salary range
+        validateSalary(department, employee);
 
         //Updating
-        employeeToUpdate.setDepartment(employee.getDepartment()); //department
+        employeeToUpdate.setDepartment(department); //department
         employeeToUpdate.setSalary(employee.getSalary()); //salary
-        employeeToUpdate.setActive(employee.isActive()); // active
+        employeeToUpdate.setActive(employee.getActive()); // active
         employeeToUpdate.setFirstName(employee.getFirstName()); //first name
         employeeToUpdate.setLastName(employee.getLastName()); // last name
         employeeToUpdate.setEmail(employee.getEmail()); //email
@@ -88,28 +96,25 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee partialUpdateEmployee(Long id, Employee employee) {
+    public Employee partialUpdateEmployee(Long id, EmployeeRequestDto employee) {
         Employee employeeToUpdate = getEmployeeById(id);
 
-        //For intern salary
-        if(employeeToUpdate.getDepartment().equalsIgnoreCase("Intern")){
-            if(employee.getSalary().compareTo(new BigDecimal("15000")) < 0)
-                throw new IllegalArgumentException("Salary must be greater than or equal to 15000 for Interns");
-        }
-        else
-            employeeToUpdate.setSalary(employee.getSalary());
+        if(employee.getDepartmentId() != null){
+            //fetch the department using the department id
+            Department department = departmentRepository.findById(employee.getDepartmentId())
+                    .orElseThrow(() -> new DepartmentNotFoundException("Department does not exist!"));
 
-        //for regular employee salary
-        if(!employeeToUpdate.getDepartment().equalsIgnoreCase("Intern")){
-            if(employee.getSalary().compareTo(new BigDecimal("30000")) < 0)
-                throw new IllegalArgumentException("Salary must be greater than or equal to 30000 for Employees");
+            employeeToUpdate.setDepartment(department); //update the field
         }
-        else
-            employeeToUpdate.setSalary(employee.getSalary());
 
-        //Other updates
-        employeeToUpdate.setDepartment(employee.getDepartment());
-        employeeToUpdate.setActive(employee.isActive());
+        if(employee.getSalary() != null){
+            validateSalary(employeeToUpdate.getDepartment(), employee);
+            employeeToUpdate.setSalary(employee.getSalary());
+        }
+
+        if(employee.getActive() != null){
+            employeeToUpdate.setActive(employee.getActive());
+        }
 
         return employeeRepository.save(employeeToUpdate);
     }
@@ -126,7 +131,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employeeToDelete = getEmployeeById(id);
 
         //hard delete if Employee Active is false
-        if(employeeToDelete.isActive())
+        if(employeeToDelete.getActive())
             throw new InvalidEmployeeStateException("Employee is still active");
 
         employeeRepository.delete(employeeToDelete);
@@ -135,6 +140,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<Employee> getEmployeeBySalaryRange(BigDecimal minSalary, BigDecimal maxSalary) {
         return employeeRepository.findBySalaryRange(minSalary, maxSalary);
+    }
+
+    //Salary validation method
+    private void validateSalary(Department department, EmployeeRequestDto employee){
+        if(department.getInternAllowed()){
+            if(employee.getSalary().compareTo(new BigDecimal("15000")) < 0)
+                throw new IllegalArgumentException("Salary must be greater than or equal to 15000 for Interns");
+        }else if(employee.getSalary().compareTo(new BigDecimal("30000")) < 0){
+            throw new IllegalArgumentException("Salary must be greater than or equal to 30000 for Employees");
+        }
     }
 
 }
