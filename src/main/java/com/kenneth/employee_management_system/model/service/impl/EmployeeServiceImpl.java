@@ -4,6 +4,7 @@ import com.kenneth.employee_management_system.exceptions.DuplicateEmailException
 import com.kenneth.employee_management_system.exceptions.EmployeeNotFoundException;
 import com.kenneth.employee_management_system.exceptions.InvalidEmployeeStateException;
 import com.kenneth.employee_management_system.model.entity.Employee;
+import com.kenneth.employee_management_system.model.repository.DepartmentRepository;
 import com.kenneth.employee_management_system.model.repository.EmployeeRepository;
 import com.kenneth.employee_management_system.model.service.EmployeeService;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,13 @@ import java.util.List;
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
 
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+    public EmployeeServiceImpl(
+            EmployeeRepository employeeRepository,
+            DepartmentRepository departmentRepository) {
         this.employeeRepository = employeeRepository;
+        this.departmentRepository = departmentRepository;
     }
 
     @Override

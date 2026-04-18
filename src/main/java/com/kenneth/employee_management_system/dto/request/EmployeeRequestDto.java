@@ -1,5 +1,6 @@
-package com.kenneth.employee_management_system.dto;
+package com.kenneth.employee_management_system.dto.request;
 
+import com.kenneth.employee_management_system.model.entity.Department;
 import com.kenneth.employee_management_system.model.entity.Employee;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -28,7 +29,7 @@ public class EmployeeRequestDto {
 
     @NotBlank
     @Size(max = 100)
-    private String department;
+    private Department department;
 
     @NotNull
     @DecimalMin("0.00")

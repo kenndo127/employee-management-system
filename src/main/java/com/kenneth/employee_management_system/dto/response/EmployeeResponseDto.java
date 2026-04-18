@@ -1,5 +1,6 @@
-package com.kenneth.employee_management_system.dto;
+package com.kenneth.employee_management_system.dto.response;
 
+import com.kenneth.employee_management_system.model.entity.Department;
 import com.kenneth.employee_management_system.model.entity.Employee;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +24,7 @@ public class EmployeeResponseDto {
 
     private String email;
 
-    private String department;
+    private Department department;
 
     private BigDecimal salary;
 

@@ -36,8 +36,8 @@ public class Employee {
     private String email;
 
     @NotBlank
-    @Size(max = 100)
-    private String department;
+    @ManyToOne
+    private Department department;
 
     @NotNull
     @DecimalMin("0.00")
