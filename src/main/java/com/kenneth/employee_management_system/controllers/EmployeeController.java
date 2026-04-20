@@ -3,12 +3,15 @@ package com.kenneth.employee_management_system.controllers;
 import com.kenneth.employee_management_system.dto.request.EmployeeRequestDto;
 import com.kenneth.employee_management_system.dto.response.EmployeeResponseDto;
 import com.kenneth.employee_management_system.dto.response.ImportResultDto;
+import com.kenneth.employee_management_system.model.entity.Employee;
 import com.kenneth.employee_management_system.model.service.EmployeeService;
 import com.kenneth.employee_management_system.model.service.ExcelExportService;
 import com.kenneth.employee_management_system.model.service.ExcelImportService;
 import com.kenneth.employee_management_system.model.service.PdfExportService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,9 +51,13 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EmployeeResponseDto>> getAllEmployees(){
-        List<EmployeeResponseDto> response = employeeService.getAllEmployees()
-                .stream().map(Employee -> EmployeeResponseDto.fromEntity(Employee)).toList();
+    public ResponseEntity<Page<EmployeeResponseDto>> getAllEmployees(
+            @RequestParam(required = false) String department,
+            @RequestParam(required = false) Boolean active,
+            Pageable pageable
+    ){
+        Page<EmployeeResponseDto> response = employeeService.getAllEmployees(department, active, pageable)
+                .map(Employee -> EmployeeResponseDto.fromEntity(Employee));
 
         return ResponseEntity.ok(response);
     }

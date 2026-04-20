@@ -10,6 +10,8 @@ import com.kenneth.employee_management_system.model.entity.Employee;
 import com.kenneth.employee_management_system.model.repository.DepartmentRepository;
 import com.kenneth.employee_management_system.model.repository.EmployeeRepository;
 import com.kenneth.employee_management_system.model.service.EmployeeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -56,8 +58,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll(); // Returns the list of all employees
+    public Page<Employee> getAllEmployees(String department, Boolean active, Pageable pageable) {
+        return employeeRepository.getAllEmployeesWithFilters(department, active, pageable);
     }
 
     @Override
