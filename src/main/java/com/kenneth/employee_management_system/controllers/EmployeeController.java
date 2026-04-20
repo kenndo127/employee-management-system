@@ -6,6 +6,7 @@ import com.kenneth.employee_management_system.dto.response.ImportResultDto;
 import com.kenneth.employee_management_system.model.service.EmployeeService;
 import com.kenneth.employee_management_system.model.service.ExcelExportService;
 import com.kenneth.employee_management_system.model.service.ExcelImportService;
+import com.kenneth.employee_management_system.model.service.PdfExportService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -24,15 +25,18 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final ExcelImportService excelImportService;
     private final ExcelExportService excelExportService;
+    private final PdfExportService pdfExportService;
 
     public EmployeeController(
             EmployeeService employeeService,
             ExcelImportService excelImportService,
-            ExcelExportService excelExportService
+            ExcelExportService excelExportService,
+            PdfExportService pdfExportService
     ){
         this.employeeService = employeeService;
         this.excelImportService = excelImportService;
         this.excelExportService = excelExportService;
+        this.pdfExportService = pdfExportService;
     }
 
     @PostMapping
