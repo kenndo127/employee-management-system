@@ -4,13 +4,16 @@ import com.kenneth.employee_management_system.dto.request.EmployeeRequestDto;
 import com.kenneth.employee_management_system.dto.response.EmployeeResponseDto;
 import com.kenneth.employee_management_system.dto.response.ImportResultDto;
 import com.kenneth.employee_management_system.model.service.EmployeeService;
+import com.kenneth.employee_management_system.model.service.ExcelExportService;
 import com.kenneth.employee_management_system.model.service.ExcelImportService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 // the legal aspect of data acquisition in
@@ -20,13 +23,16 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final ExcelImportService excelImportService;
+    private final ExcelExportService excelExportService;
 
     public EmployeeController(
             EmployeeService employeeService,
-            ExcelImportService excelImportService
+            ExcelImportService excelImportService,
+            ExcelExportService excelExportService
     ){
         this.employeeService = employeeService;
         this.excelImportService = excelImportService;
+        this.excelExportService = excelExportService;
     }
 
     @PostMapping
@@ -101,5 +107,21 @@ public class EmployeeController {
     public ResponseEntity<ImportResultDto> importEmployees(
             @RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok(excelImportService.importEmployees(file));
+    }
+
+    @GetMapping("/export/excel")
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=employees_" +
+                System.currentTimeMillis() + ".xlsx");
+        excelExportService.exportEmployees(response.getOutputStream());
+    }
+
+    @GetMapping("/export/pdf")
+    public void exportToPdf(HttpServletResponse response) throws IOException {
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=employee_report_" +
+                System.currentTimeMillis() + ".pdf");
+        pdfExportService.exportEmployees(response.getOutputStream());
     }
 }

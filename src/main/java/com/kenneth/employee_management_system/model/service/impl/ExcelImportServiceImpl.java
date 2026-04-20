@@ -150,7 +150,6 @@ public class ExcelImportServiceImpl implements ExcelImportService {
         return result;
     }
 
-
     private String getCellValue(XSSFCell cell) {
         if (cell == null) return "";
         return switch (cell.getCellType()) {
